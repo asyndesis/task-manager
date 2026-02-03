@@ -76,6 +76,12 @@ export const useTasks = () => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  const updateTask = (id, updates) => {
+    setTasks(
+      tasks.map((task) => (task.id === id ? { ...task, ...updates } : task))
+    );
+  };
+
   const filteredTasks = tasks.filter((task) => {
     // Filter by status
     if (filter === FILTER.COMPLETED && !task.completed) return false;
@@ -102,6 +108,7 @@ export const useTasks = () => {
     addTask,
     toggleTask,
     deleteTask,
+    updateTask,
     stats,
     filter,
     setFilter,

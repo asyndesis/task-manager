@@ -18,6 +18,7 @@ function App() {
     addTask,
     toggleTask,
     deleteTask,
+    updateTask,
     stats,
     filter,
     setFilter,
@@ -63,6 +64,7 @@ function App() {
               tasks={tasks}
               onToggle={toggleTask}
               onDelete={deleteTask}
+              onUpdate={updateTask}
             />
           </div>
         </div>
