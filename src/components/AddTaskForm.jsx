@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,9 +11,7 @@ import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { PRIORITY } from "@/constants/taskConstants";
 import { Loader2 } from "lucide-react";
 
-export const AddTaskForm = ({ onAdd }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+export const AddTaskForm = ({ onAdd, isSubmitting = false }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -22,9 +19,7 @@ export const AddTaskForm = ({ onAdd }) => {
     const priority = formData.get("priority");
 
     if (title?.trim()) {
-      setIsSubmitting(true);
       await onAdd({ title, priority });
-      setIsSubmitting(false);
       e.target.reset();
     }
   };

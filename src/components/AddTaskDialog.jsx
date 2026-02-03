@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 export const AddTaskDialog = () => {
   const isLoading = useTaskStore((state) => state.isLoading);
+  const isAdding = useTaskStore((state) => state.isAdding);
   const isDialogOpen = useTaskStore(selectIsAddDialogOpen);
   const openAddDialog = useTaskStore((state) => state.openAddDialog);
   const closeAddDialog = useTaskStore((state) => state.closeAddDialog);
@@ -52,7 +53,7 @@ export const AddTaskDialog = () => {
         <DialogHeader>
           <DialogTitle>Create New Task</DialogTitle>
         </DialogHeader>
-        <AddTaskForm onAdd={handleAddTask} />
+        <AddTaskForm onAdd={handleAddTask} isSubmitting={isAdding} />
       </DialogContent>
     </Dialog>
   );
