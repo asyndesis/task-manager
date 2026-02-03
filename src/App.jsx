@@ -1,6 +1,7 @@
 import { useTasks } from "@/hooks/useTasks";
 import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
+import { TaskStats } from "@/components/TaskStats";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
 import { APP_BACKGROUND } from "@/constants/taskStyles";
 
 function App() {
-  const { tasks, addTask, toggleTask, deleteTask } = useTasks();
+  const { tasks, addTask, toggleTask, deleteTask, stats } = useTasks();
 
   return (
     <div className={`min-h-screen bg-${APP_BACKGROUND} p-4 md:p-8`}>
@@ -33,8 +34,22 @@ function App() {
           </Dialog>
         </div>
 
-        {/* Task List */}
-        <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
+        {/* Mobile: Stack vertical, Desktop: Horizontal (sidebar + main) */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Left Sidebar: Stats & Filters */}
+          <div className="w-full md:w-64 space-y-4">
+            <TaskStats stats={stats} />
+          </div>
+
+          {/* Right: Task List */}
+          <div className="flex-1">
+            <TaskList
+              tasks={tasks}
+              onToggle={toggleTask}
+              onDelete={deleteTask}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

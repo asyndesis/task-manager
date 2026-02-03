@@ -68,5 +68,6 @@ export const useTasks = () => {
     toggleTask,
     deleteTask,
     stats,
+    tasks,
   };
 };
