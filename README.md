@@ -7,7 +7,7 @@ npm install
 npm run dev
 ```
 
-### Features Implemented
+### Features Implemented Phase 1
 
 - ✅ Add tasks with title and priority (High/Medium/Low)
 - ✅ Display tasks in organized list
@@ -16,6 +16,10 @@ npm run dev
 - ✅ Task counter (total, completed, progress %)
 - ✅ Status filter (All/Completed/Incomplete)
 - ✅ Search filter with debouncing
+
+### Features Implemented Phase 2
+
+- ✅ Inline title editing
 
 ### Technical Stack
 
