@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTaskStore } from "@/stores/taskStore";
 import { SidebarCard } from "@/components/SidebarCard";
 import {
   InputGroup,
@@ -17,13 +18,14 @@ import { FILTER } from "@/constants/taskConstants";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Search, Filter } from "lucide-react";
 
-const TaskSearch = ({ onSearchChange }) => {
+const TaskSearch = () => {
+  const setSearchTerm = useTaskStore((state) => state.setSearchTerm);
   const [localSearch, setLocalSearch] = useState("");
   const debouncedSearch = useDebounce(localSearch, 300);
 
   useEffect(() => {
-    onSearchChange(debouncedSearch);
-  }, [debouncedSearch, onSearchChange]);
+    setSearchTerm(debouncedSearch);
+  }, [debouncedSearch, setSearchTerm]);
 
   return (
     <Field>
@@ -45,12 +47,15 @@ const TaskSearch = ({ onSearchChange }) => {
   );
 };
 
-const TaskStatusFilter = ({ filter, onFilterChange }) => {
+const TaskStatusFilter = () => {
+  const filter = useTaskStore((state) => state.filter);
+  const setFilter = useTaskStore((state) => state.setFilter);
+
   return (
     <Field>
       <FieldLabel htmlFor="status-filter">Status</FieldLabel>
       <FieldContent>
-        <Select value={filter} onValueChange={onFilterChange}>
+        <Select value={filter} onValueChange={setFilter}>
           <SelectTrigger id="status-filter">
             <SelectValue />
           </SelectTrigger>
@@ -65,12 +70,12 @@ const TaskStatusFilter = ({ filter, onFilterChange }) => {
   );
 };
 
-export const TaskFilters = ({ filter, onFilterChange, onSearchChange }) => {
+export const TaskFilters = () => {
   return (
     <SidebarCard icon={Filter} title="Filters">
       <div className="space-y-4">
-        <TaskSearch onSearchChange={onSearchChange} />
-        <TaskStatusFilter filter={filter} onFilterChange={onFilterChange} />
+        <TaskSearch />
+        <TaskStatusFilter />
       </div>
     </SidebarCard>
   );

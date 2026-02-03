@@ -1,10 +1,16 @@
+import { useTaskStore, selectIsLoading } from "@/stores/taskStore";
 import { SidebarCard } from "@/components/SidebarCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3 } from "lucide-react";
 
-export const TaskStats = ({ stats, isLoading }) => {
-  const completionRate =
-    stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+export const TaskStats = () => {
+  const isLoading = useTaskStore(selectIsLoading);
+  const total = useTaskStore((state) => state.tasks.length);
+  const completed = useTaskStore(
+    (state) => state.tasks.filter((t) => t.completed).length
+  );
+
+  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
     <SidebarCard icon={BarChart3} title="Stats">
@@ -14,7 +20,7 @@ export const TaskStats = ({ stats, isLoading }) => {
           {isLoading ? (
             <Skeleton className="h-5 w-8" />
           ) : (
-            <span className="font-semibold">{stats.total}</span>
+            <span className="font-semibold">{total}</span>
           )}
         </div>
         <div className="flex justify-between">
@@ -22,9 +28,7 @@ export const TaskStats = ({ stats, isLoading }) => {
           {isLoading ? (
             <Skeleton className="h-5 w-8" />
           ) : (
-            <span className="font-semibold text-green-600">
-              {stats.completed}
-            </span>
+            <span className="font-semibold text-green-600">{completed}</span>
           )}
         </div>
         <div className="flex justify-between">
