@@ -187,7 +187,7 @@ const TaskItem = ({ task }) => {
 const TaskListSkeleton = () => (
   <div className="space-y-2">
     {[1, 2, 3].map((i) => (
-      <Card key={i} className="p-3">
+      <Card key={i} className="p-3" data-testid="skeleton">
         <div className="flex items-center gap-3">
           <Skeleton className="h-5 w-5 rounded" />
           <Skeleton className="h-5 flex-1" />
