@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
@@ -11,10 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
 function App() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     tasks,
+    isLoading,
+    isAdding,
     addTask,
     toggleTask,
     deleteTask,
@@ -26,21 +31,35 @@ function App() {
     setSearchTerm,
   } = useTasks();
 
+  const handleAddTask = async (taskData) => {
+    await addTask(taskData);
+    setIsDialogOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-task-bg p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Task Manager</h1>
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>Add Task</Button>
+              <Button disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Add Task"
+                )}
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create New Task</DialogTitle>
               </DialogHeader>
-              <AddTaskForm onAdd={addTask} />
+              <AddTaskForm onAdd={handleAddTask} />
             </DialogContent>
           </Dialog>
         </div>
@@ -49,7 +68,7 @@ function App() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar: Stats & Filters */}
           <div className="w-full md:w-64 space-y-4">
-            <TaskStats stats={stats} />
+            <TaskStats stats={stats} isLoading={isLoading} />
             <TaskFilters
               filter={filter}
               onFilterChange={setFilter}
@@ -62,6 +81,7 @@ function App() {
           <div className="flex-1">
             <TaskList
               tasks={tasks}
+              isLoading={isLoading}
               onToggle={toggleTask}
               onDelete={deleteTask}
               onUpdate={updateTask}

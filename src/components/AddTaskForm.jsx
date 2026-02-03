@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,20 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
-import { PRIORITY } from "@/hooks/useTasks";
+import { PRIORITY } from "@/constants/taskConstants";
+import { Loader2 } from "lucide-react";
 
 export const AddTaskForm = ({ onAdd }) => {
-  // TODO: If we want validation, here:
-  // - Should be using ZOD
-  // - Should be using React Hook Form or similar for better feedback on errors
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const title = formData.get("title");
     const priority = formData.get("priority");
 
     if (title?.trim()) {
-      onAdd({ title, priority });
+      setIsSubmitting(true);
+      await onAdd({ title, priority });
+      setIsSubmitting(false);
       e.target.reset();
     }
   };
@@ -36,6 +39,7 @@ export const AddTaskForm = ({ onAdd }) => {
             name="title"
             placeholder="Enter task title..."
             required
+            disabled={isSubmitting}
           />
         </FieldContent>
       </Field>
@@ -43,7 +47,11 @@ export const AddTaskForm = ({ onAdd }) => {
       <Field>
         <FieldLabel htmlFor="priority">Priority</FieldLabel>
         <FieldContent>
-          <Select name="priority" defaultValue={PRIORITY.MEDIUM}>
+          <Select
+            name="priority"
+            defaultValue={PRIORITY.MEDIUM}
+            disabled={isSubmitting}
+          >
             <SelectTrigger id="priority">
               <SelectValue />
             </SelectTrigger>
@@ -56,8 +64,15 @@ export const AddTaskForm = ({ onAdd }) => {
         </FieldContent>
       </Field>
 
-      <Button type="submit" className="w-full">
-        Add Task
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Adding...
+          </>
+        ) : (
+          "Add Task"
+        )}
       </Button>
     </form>
   );

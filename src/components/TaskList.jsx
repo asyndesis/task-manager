@@ -13,7 +13,7 @@ import {
   TASK_PRIORITY_CLASSES,
   TASK_TEXT_COMPLETED,
   TASK_TEXT_ACTIVE,
-} from "@/constants/taskStyles";
+} from "@/constants/taskConstants";
 import { Pencil, Check, X, Trash2 } from "lucide-react";
 
 const TaskItemActions = ({ isEditing, onEdit, onSave, onCancel, onDelete }) => {
@@ -149,7 +149,35 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate }) => {
   );
 };
 
-export const TaskList = ({ tasks, onToggle, onDelete, onUpdate }) => {
+import { Skeleton } from "@/components/ui/skeleton";
+
+const TaskListSkeleton = () => (
+  <div className="space-y-2">
+    {[1, 2, 3].map((i) => (
+      <Card key={i} className="p-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="h-5 flex-1" />
+          <Skeleton className="h-6 w-16" />
+          <Skeleton className="h-8 w-8 rounded" />
+          <Skeleton className="h-8 w-8 rounded" />
+        </div>
+      </Card>
+    ))}
+  </div>
+);
+
+export const TaskList = ({
+  tasks,
+  isLoading,
+  onToggle,
+  onDelete,
+  onUpdate,
+}) => {
+  if (isLoading) {
+    return <TaskListSkeleton />;
+  }
+
   if (tasks.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">

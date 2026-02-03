@@ -1,4 +1,14 @@
-import { PRIORITY } from "@/hooks/useTasks";
+export const PRIORITY = {
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+};
+
+export const FILTER = {
+  ALL: "all",
+  COMPLETED: "completed",
+  INCOMPLETE: "incomplete",
+};
 
 export const TASK_PRIORITY_CLASSES = {
   [PRIORITY.HIGH]: "text-task-high border-task-high",

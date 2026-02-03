@@ -1,110 +1,88 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { taskStorage } from "@/services/taskStorage";
+import { PRIORITY, FILTER } from "@/constants/taskConstants";
 
-export const PRIORITY = {
-  HIGH: "high",
-  MEDIUM: "medium",
-  LOW: "low",
-};
-
-export const FILTER = {
-  ALL: "all",
-  COMPLETED: "completed",
-  INCOMPLETE: "incomplete",
-};
-
-/*
-Note: If we were using typescript, we would use the following interface:
-interface Task {
-  id: number;
-  title: string;
-  priority: "high" | "medium" | "low";
-  completed: boolean;
-  createdAt: string;
-}
-*/
-
+// This function has become pretty complex, and should be refactored into a context
+// Or smaller query and mutation wrapper functions.  This is fine for a demo as it's less for us to review
 export const useTasks = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Complete coding test",
-      priority: PRIORITY.HIGH,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      title: "Review documentation",
-      priority: PRIORITY.MEDIUM,
-      completed: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 3,
-      title: "Setup development environment",
-      priority: PRIORITY.LOW,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
   const [filter, setFilter] = useState(FILTER.ALL);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const addTask = ({ title, priority = PRIORITY.MEDIUM }) => {
+  // Simulates a network request to load tasks
+  // In a real application, this would be replaced with a call to an API
+  useEffect(() => {
+    const loadTasks = async () => {
+      setIsLoading(true);
+      const loadedTasks = await taskStorage.getAll();
+      setTasks(loadedTasks);
+      setIsLoading(false);
+    };
+    loadTasks();
+  }, []);
+
+  const addTask = async ({ title, priority = PRIORITY.MEDIUM }) => {
     if (!title.trim()) return;
-    setTasks([
-      {
-        id: Date.now(),
-        title,
-        priority,
-        completed: false,
-        createdAt: new Date().toISOString(),
-      },
-      ...tasks,
-    ]);
+    setIsAdding(true);
+    const newTask = {
+      id: Date.now(),
+      title,
+      priority,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+    const updatedTasks = await taskStorage.create(newTask);
+    setTasks(updatedTasks);
+    setIsAdding(false);
   };
 
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const toggleTask = async (id) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    const updatedTasks = await taskStorage.update(id, {
+      completed: !task.completed,
+    });
+    setTasks(updatedTasks);
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = async (id) => {
+    const updatedTasks = await taskStorage.delete(id);
+    setTasks(updatedTasks);
   };
 
-  const updateTask = (id, updates) => {
-    setTasks(
-      tasks.map((task) => (task.id === id ? { ...task, ...updates } : task))
-    );
+  const updateTask = async (id, updates) => {
+    const updatedTasks = await taskStorage.update(id, updates);
+    setTasks(updatedTasks);
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    // Filter by status
-    if (filter === FILTER.COMPLETED && !task.completed) return false;
-    if (filter === FILTER.INCOMPLETE && task.completed) return false;
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      const matchesStatus =
+        filter === FILTER.ALL ||
+        (filter === FILTER.COMPLETED && task.completed) ||
+        (filter === FILTER.INCOMPLETE && !task.completed);
 
-    // Filter by search term
-    if (
-      searchTerm.trim() &&
-      !task.title.toLowerCase().includes(searchTerm.toLowerCase())
-    ) {
-      return false;
-    }
+      const matchesSearch =
+        !searchTerm.trim() ||
+        task.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return true;
-  });
+      return matchesStatus && matchesSearch;
+    });
+  }, [tasks, filter, searchTerm]);
 
-  const stats = {
-    total: tasks.length,
-    completed: tasks.filter((t) => t.completed).length,
-  };
+  const stats = useMemo(() => {
+    return {
+      total: tasks.length,
+      completed: tasks.filter((t) => t.completed).length,
+    };
+  }, [tasks]);
 
   return {
     tasks: filteredTasks,
+    isLoading,
+    isAdding,
     addTask,
     toggleTask,
     deleteTask,
@@ -116,3 +94,6 @@ export const useTasks = () => {
     setSearchTerm,
   };
 };
+
+// Re-export constants for convenience
+export { PRIORITY, FILTER };

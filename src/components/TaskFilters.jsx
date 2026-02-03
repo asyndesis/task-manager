@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { SidebarCard } from "@/components/SidebarCard";
 import {
   InputGroup,
   InputGroupAddon,
@@ -13,9 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
-import { FILTER } from "@/hooks/useTasks";
+import { FILTER } from "@/constants/taskConstants";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Search } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 
 const TaskSearch = ({ onSearchChange }) => {
   const [localSearch, setLocalSearch] = useState("");
@@ -67,12 +67,11 @@ const TaskStatusFilter = ({ filter, onFilterChange }) => {
 
 export const TaskFilters = ({ filter, onFilterChange, onSearchChange }) => {
   return (
-    <Card className="p-4">
-      <h2 className="text-sm font-medium text-gray-500 mb-3">Filters</h2>
+    <SidebarCard icon={Filter} title="Filters">
       <div className="space-y-4">
         <TaskSearch onSearchChange={onSearchChange} />
         <TaskStatusFilter filter={filter} onFilterChange={onFilterChange} />
       </div>
-    </Card>
+    </SidebarCard>
   );
 };
