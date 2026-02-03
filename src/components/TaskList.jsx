@@ -15,8 +15,13 @@ import {
   TASK_PRIORITY_CLASSES,
   TASK_TEXT_COMPLETED,
   TASK_TEXT_ACTIVE,
+  FILTER,
 } from "@/constants/taskConstants";
-import { useTaskStore, selectIsLoading } from "@/stores/taskStore";
+import {
+  useTaskStore,
+  selectIsLoading,
+  selectHasActiveFilters,
+} from "@/stores/taskStore";
 import { useFilteredTasks } from "@/hooks/useFilteredTasks";
 import { Pencil, Check, X, Trash2 } from "lucide-react";
 
@@ -197,6 +202,7 @@ const TaskListSkeleton = () => (
 
 export const TaskList = () => {
   const isLoading = useTaskStore(selectIsLoading);
+  const hasActiveFilters = useTaskStore(selectHasActiveFilters);
   const tasks = useFilteredTasks();
 
   if (isLoading) {
@@ -206,7 +212,14 @@ export const TaskList = () => {
   if (tasks.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
-        No tasks yet. Add one to get started!
+        {hasActiveFilters ? (
+          <>
+            <p>No tasks match your filters</p>
+            <p className="text-sm mt-2">Try adjusting your search or filter</p>
+          </>
+        ) : (
+          "No tasks yet. Add one to get started!"
+        )}
       </div>
     );
   }

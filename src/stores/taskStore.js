@@ -132,3 +132,5 @@ export const selectIsLoading = (state) => state.isLoading;
 export const selectFilter = (state) => state.filter;
 export const selectSearchTerm = (state) => state.searchTerm;
 export const selectIsAddDialogOpen = (state) => state.isAddDialogOpen;
+export const selectHasActiveFilters = (state) =>
+  state.filter !== FILTER.ALL || state.searchTerm.trim() !== "";
