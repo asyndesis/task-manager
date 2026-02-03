@@ -32,7 +32,7 @@ export const useTasks = () => {
     },
   ]);
 
-  const addTask = (title, priority = PRIORITY.MEDIUM) => {
+  const addTask = ({ title, priority = PRIORITY.MEDIUM }) => {
     if (!title.trim()) return;
     setTasks([
       {
@@ -63,5 +63,10 @@ export const useTasks = () => {
     completed: tasks.filter((t) => t.completed).length,
   };
 
-  return { tasks, addTask, toggleTask, deleteTask, stats };
+  return {
+    addTask,
+    toggleTask,
+    deleteTask,
+    stats,
+  };
 };

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,15 +11,18 @@ import { Field, FieldLabel, FieldContent } from "@/components/ui/field";
 import { PRIORITY } from "@/hooks/useTasks";
 
 export const AddTaskForm = ({ onAdd }) => {
-  const [title, setTitle] = useState("");
-  const [priority, setPriority] = useState(PRIORITY.MEDIUM);
-
+  // TODO: If we want validation, here:
+  // - Should be using ZOD
+  // - Should be using React Hook Form or similar for better feedback on errors
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (title.trim()) {
-      onAdd(title, priority);
-      setTitle("");
-      setPriority(PRIORITY.MEDIUM);
+    const formData = new FormData(e.target);
+    const title = formData.get("title");
+    const priority = formData.get("priority");
+
+    if (title?.trim()) {
+      onAdd({ title, priority });
+      e.target.reset();
     }
   };
 
@@ -31,9 +33,9 @@ export const AddTaskForm = ({ onAdd }) => {
         <FieldContent>
           <Input
             id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
             placeholder="Enter task title..."
+            required
           />
         </FieldContent>
       </Field>
@@ -41,7 +43,7 @@ export const AddTaskForm = ({ onAdd }) => {
       <Field>
         <FieldLabel htmlFor="priority">Priority</FieldLabel>
         <FieldContent>
-          <Select value={priority} onValueChange={setPriority}>
+          <Select name="priority" defaultValue={PRIORITY.MEDIUM}>
             <SelectTrigger id="priority">
               <SelectValue />
             </SelectTrigger>
