@@ -4,6 +4,7 @@ import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
 import { TaskStats } from "@/components/TaskStats";
 import { TaskFilters } from "@/components/TaskFilters";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -79,13 +80,18 @@ function App() {
 
           {/* Right: Task List */}
           <div className="flex-1">
-            <TaskList
-              tasks={tasks}
-              isLoading={isLoading}
-              onToggle={toggleTask}
-              onDelete={deleteTask}
-              onUpdate={updateTask}
-            />
+            <ErrorBoundary
+              title="Task List Error"
+              message="Unable to display tasks. Your data is safe, but there was an issue rendering the list."
+            >
+              <TaskList
+                tasks={tasks}
+                isLoading={isLoading}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onUpdate={updateTask}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       </div>
