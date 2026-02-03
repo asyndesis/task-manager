@@ -1,45 +1,17 @@
-import { useState } from "react";
-import { useTaskDispatch } from "@/contexts/TaskDispatchContext";
 import { TaskList } from "@/components/TaskList";
-import { AddTaskForm } from "@/components/AddTaskForm";
+import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { TaskStats } from "@/components/TaskStats";
 import { TaskFilters } from "@/components/TaskFilters";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 function App() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { addTask } = useTaskDispatch();
-
-  const handleAddTask = async (taskData) => {
-    await addTask(taskData);
-    setIsDialogOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-task-bg p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Task Manager</h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>Add Task</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Task</DialogTitle>
-              </DialogHeader>
-              <AddTaskForm onAdd={handleAddTask} />
-            </DialogContent>
-          </Dialog>
+          <AddTaskDialog />
         </div>
 
         {/* Mobile: Stack vertical, Desktop: Horizontal (sidebar + main) */}
