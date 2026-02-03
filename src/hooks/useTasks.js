@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// Enums
 export const PRIORITY = {
   HIGH: "high",
   MEDIUM: "medium",
@@ -12,6 +11,17 @@ export const FILTER = {
   COMPLETED: "completed",
   INCOMPLETE: "incomplete",
 };
+
+/*
+Note: If we were using typescript, we would use the following interface:
+interface Task {
+  id: number;
+  title: string;
+  priority: "high" | "medium" | "low";
+  completed: boolean;
+  createdAt: string;
+}
+*/
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState([
