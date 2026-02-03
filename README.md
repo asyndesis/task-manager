@@ -33,6 +33,7 @@ npm run dev
 
 ### Known Limitations
 
+- No smart context management. (everything in useTasks) is an antipattern.  Should use context, zustand, or smaller focused hooks!
 - No typescript. (Really would make code easier to debug)
 - No tests. Time limitation made this though, but we should be testing at least unit on components and various functions in state-management
 - No form validation (Should probably use zod)
