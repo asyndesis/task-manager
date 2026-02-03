@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -13,7 +15,14 @@ import {
   TASK_PRIORITY_CLASSES,
   TASK_TEXT_COMPLETED,
   TASK_TEXT_ACTIVE,
+  FILTER,
 } from "@/constants/taskConstants";
+import {
+  useTaskStore,
+  selectIsLoading,
+  selectHasActiveFilters,
+} from "@/stores/taskStore";
+import { useFilteredTasks } from "@/hooks/useFilteredTasks";
 import { Pencil, Check, X, Trash2 } from "lucide-react";
 
 const TaskItemActions = ({ isEditing, onEdit, onSave, onCancel, onDelete }) => {
@@ -82,16 +91,45 @@ const TaskItemActions = ({ isEditing, onEdit, onSave, onCancel, onDelete }) => {
   );
 };
 
-const TaskItem = ({ task, onToggle, onDelete, onUpdate }) => {
+const TaskItem = ({ task }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
 
-  const handleSave = () => {
+  const toggleTask = useTaskStore((state) => state.toggleTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
+  const updateTask = useTaskStore((state) => state.updateTask);
+
+  const handleSave = async () => {
     const trimmed = editTitle.trim();
     if (trimmed && trimmed !== task.title) {
-      onUpdate(task.id, { title: trimmed });
+      const result = await updateTask(task.id, { title: trimmed });
+      if (result?.success) {
+        toast.success("Task updated");
+      } else if (result?.success === false) {
+        toast.error("Failed to update task");
+      }
     }
     setIsEditing(false);
+  };
+
+  const handleToggle = async () => {
+    const result = await toggleTask(task.id);
+    if (result?.success) {
+      toast.success(
+        result.wasCompleted ? "Task completed" : "Task marked incomplete"
+      );
+    } else if (result?.success === false) {
+      toast.error("Failed to update task");
+    }
+  };
+
+  const handleDelete = async () => {
+    const result = await deleteTask(task.id);
+    if (result?.success) {
+      toast.success("Task deleted");
+    } else if (result?.success === false) {
+      toast.error("Failed to delete task");
+    }
   };
 
   const handleCancel = () => {
@@ -109,10 +147,7 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate }) => {
   return (
     <Card className="p-3">
       <div className="flex items-center gap-3">
-        <Checkbox
-          checked={task.completed}
-          onCheckedChange={() => onToggle(task.id)}
-        />
+        <Checkbox checked={task.completed} onCheckedChange={handleToggle} />
 
         <div className="flex-1 min-h-[36px] flex items-center">
           {isEditing ? (
@@ -141,7 +176,7 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate }) => {
             onEdit={() => setIsEditing(true)}
             onSave={handleSave}
             onCancel={handleCancel}
-            onDelete={() => onDelete(task.id)}
+            onDelete={handleDelete}
           />
         </div>
       </div>
@@ -149,12 +184,10 @@ const TaskItem = ({ task, onToggle, onDelete, onUpdate }) => {
   );
 };
 
-import { Skeleton } from "@/components/ui/skeleton";
-
 const TaskListSkeleton = () => (
   <div className="space-y-2">
     {[1, 2, 3].map((i) => (
-      <Card key={i} className="p-3">
+      <Card key={i} className="p-3" data-testid="skeleton">
         <div className="flex items-center gap-3">
           <Skeleton className="h-5 w-5 rounded" />
           <Skeleton className="h-5 flex-1" />
@@ -167,13 +200,11 @@ const TaskListSkeleton = () => (
   </div>
 );
 
-export const TaskList = ({
-  tasks,
-  isLoading,
-  onToggle,
-  onDelete,
-  onUpdate,
-}) => {
+export const TaskList = () => {
+  const isLoading = useTaskStore(selectIsLoading);
+  const hasActiveFilters = useTaskStore(selectHasActiveFilters);
+  const tasks = useFilteredTasks();
+
   if (isLoading) {
     return <TaskListSkeleton />;
   }
@@ -181,7 +212,14 @@ export const TaskList = ({
   if (tasks.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
-        No tasks yet. Add one to get started!
+        {hasActiveFilters ? (
+          <>
+            <p>No tasks match your filters</p>
+            <p className="text-sm mt-2">Try adjusting your search or filter</p>
+          </>
+        ) : (
+          "No tasks yet. Add one to get started!"
+        )}
       </div>
     );
   }
@@ -189,13 +227,7 @@ export const TaskList = ({
   return (
     <div className="space-y-2">
       {tasks.map((task) => (
-        <TaskItem
-          key={task.id}
-          task={task}
-          onToggle={onToggle}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
-        />
+        <TaskItem key={task.id} task={task} />
       ))}
     </div>
   );
