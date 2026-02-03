@@ -8,5 +8,3 @@ export const TASK_PRIORITY_CLASSES = {
 
 export const TASK_TEXT_COMPLETED = "line-through text-task-completed";
 export const TASK_TEXT_ACTIVE = "text-gray-900";
-
-export const APP_BACKGROUND = "task-bg";

@@ -7,6 +7,12 @@ export const PRIORITY = {
   LOW: "low",
 };
 
+export const FILTER = {
+  ALL: "all",
+  COMPLETED: "completed",
+  INCOMPLETE: "incomplete",
+};
+
 export const useTasks = () => {
   const [tasks, setTasks] = useState([
     {
@@ -31,6 +37,8 @@ export const useTasks = () => {
       createdAt: new Date().toISOString(),
     },
   ]);
+  const [filter, setFilter] = useState(FILTER.ALL);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const addTask = ({ title, priority = PRIORITY.MEDIUM }) => {
     if (!title.trim()) return;
@@ -58,16 +66,36 @@ export const useTasks = () => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  const filteredTasks = tasks.filter((task) => {
+    // Filter by status
+    if (filter === FILTER.COMPLETED && !task.completed) return false;
+    if (filter === FILTER.INCOMPLETE && task.completed) return false;
+
+    // Filter by search term
+    if (
+      searchTerm.trim() &&
+      !task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
   const stats = {
     total: tasks.length,
     completed: tasks.filter((t) => t.completed).length,
   };
 
   return {
+    tasks: filteredTasks,
     addTask,
     toggleTask,
     deleteTask,
     stats,
-    tasks,
+    filter,
+    setFilter,
+    searchTerm,
+    setSearchTerm,
   };
 };
