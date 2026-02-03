@@ -20,6 +20,8 @@ npm run dev
 ### Features Implemented Phase 2
 
 - ✅ Inline title editing
+- ✅ Uses localstorage and pretends it's an api with fake delay (easier to transition to API later)
+- ✅ Optimistic updates in useTasks.js
 
 ### Technical Stack
 
@@ -31,5 +33,8 @@ npm run dev
 
 ### Known Limitations
 
-- LocalStorage persistence not yet implemented
-- Inline task editing not yet implemented
+- No typescript. (Really would make code easier to debug)
+- No tests. Time limitation made this though, but we should be testing at least unit on components and various functions in state-management
+- No form validation (Should probably use zod)
+- No feedback when things happen. (Would like to add toast messages when things are saved / updated etc...)
+- Pretty ugly ui. It's basic, but at least we have shadcn and tailwind in place so that can be easily improved.

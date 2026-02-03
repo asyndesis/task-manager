@@ -33,28 +33,81 @@ export const useTasks = () => {
       completed: false,
       createdAt: new Date().toISOString(),
     };
-    const updatedTasks = await taskStorage.create(newTask);
-    setTasks(updatedTasks);
-    setIsAdding(false);
+
+    // Optimistic update
+    setTasks((prev) => [newTask, ...prev]);
+
+    try {
+      // Sync with storage in background
+      await taskStorage.create(newTask);
+    } catch (error) {
+      // Rollback on error
+      console.error("Failed to add task:", error);
+      setTasks((prev) => prev.filter((t) => t.id !== newTask.id));
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const toggleTask = async (id) => {
     const task = tasks.find((t) => t.id === id);
     if (!task) return;
-    const updatedTasks = await taskStorage.update(id, {
-      completed: !task.completed,
-    });
-    setTasks(updatedTasks);
+
+    // Optimistic update
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+
+    try {
+      // Sync with storage in background
+      await taskStorage.update(id, { completed: !task.completed });
+    } catch (error) {
+      // Rollback on error
+      console.error("Failed to toggle task:", error);
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, completed: task.completed } : t))
+      );
+    }
   };
 
   const deleteTask = async (id) => {
-    const updatedTasks = await taskStorage.delete(id);
-    setTasks(updatedTasks);
+    const deletedTask = tasks.find((t) => t.id === id);
+    if (!deletedTask) return;
+
+    // Optimistic update
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+
+    try {
+      // Sync with storage in background
+      await taskStorage.delete(id);
+    } catch (error) {
+      // Rollback on error
+      console.error("Failed to delete task:", error);
+      setTasks((prev) =>
+        [...prev, deletedTask].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )
+      );
+    }
   };
 
   const updateTask = async (id, updates) => {
-    const updatedTasks = await taskStorage.update(id, updates);
-    setTasks(updatedTasks);
+    const originalTask = tasks.find((t) => t.id === id);
+    if (!originalTask) return;
+
+    // Optimistic update
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+    );
+
+    try {
+      // Sync with storage in background
+      await taskStorage.update(id, updates);
+    } catch (error) {
+      // Rollback on error
+      console.error("Failed to update task:", error);
+      setTasks((prev) => prev.map((t) => (t.id === id ? originalTask : t)));
+    }
   };
 
   const filteredTasks = useMemo(() => {

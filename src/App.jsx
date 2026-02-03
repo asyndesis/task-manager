@@ -20,7 +20,6 @@ function App() {
   const {
     tasks,
     isLoading,
-    isAdding,
     addTask,
     toggleTask,
     deleteTask,
