@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTaskState } from "@/contexts/TaskStateContext";
+import { useTaskDispatch } from "@/contexts/TaskDispatchContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -167,13 +169,10 @@ const TaskListSkeleton = () => (
   </div>
 );
 
-export const TaskList = ({
-  tasks,
-  isLoading,
-  onToggle,
-  onDelete,
-  onUpdate,
-}) => {
+export const TaskList = () => {
+  const { tasks, isLoading } = useTaskState();
+  const { toggleTask, deleteTask, updateTask } = useTaskDispatch();
+
   if (isLoading) {
     return <TaskListSkeleton />;
   }
@@ -192,9 +191,9 @@ export const TaskList = ({
         <TaskItem
           key={task.id}
           task={task}
-          onToggle={onToggle}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
+          onToggle={toggleTask}
+          onDelete={deleteTask}
+          onUpdate={updateTask}
         />
       ))}
     </div>

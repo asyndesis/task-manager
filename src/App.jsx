@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTasks } from "@/hooks/useTasks";
+import { useTaskDispatch } from "@/contexts/TaskDispatchContext";
 import { TaskList } from "@/components/TaskList";
 import { AddTaskForm } from "@/components/AddTaskForm";
 import { TaskStats } from "@/components/TaskStats";
@@ -13,23 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
 
 function App() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {
-    tasks,
-    isLoading,
-    addTask,
-    toggleTask,
-    deleteTask,
-    updateTask,
-    stats,
-    filter,
-    setFilter,
-    searchTerm,
-    setSearchTerm,
-  } = useTasks();
+  const { addTask } = useTaskDispatch();
 
   const handleAddTask = async (taskData) => {
     await addTask(taskData);
@@ -44,16 +31,7 @@ function App() {
           <h1 className="text-2xl font-bold">Task Manager</h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  "Add Task"
-                )}
-              </Button>
+              <Button>Add Task</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -68,13 +46,8 @@ function App() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Sidebar: Stats & Filters */}
           <div className="w-full md:w-64 space-y-4">
-            <TaskStats stats={stats} isLoading={isLoading} />
-            <TaskFilters
-              filter={filter}
-              onFilterChange={setFilter}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-            />
+            <TaskStats />
+            <TaskFilters />
           </div>
 
           {/* Right: Task List */}
@@ -83,13 +56,7 @@ function App() {
               title="Task List Error"
               message="Unable to display tasks. Your data is safe, but there was an issue rendering the list."
             >
-              <TaskList
-                tasks={tasks}
-                isLoading={isLoading}
-                onToggle={toggleTask}
-                onDelete={deleteTask}
-                onUpdate={updateTask}
-              />
+              <TaskList />
             </ErrorBoundary>
           </div>
         </div>
