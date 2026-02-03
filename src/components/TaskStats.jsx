@@ -1,8 +1,10 @@
 import { SidebarCard } from "@/components/SidebarCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTaskState } from "@/contexts/TaskStateContext";
 import { BarChart3 } from "lucide-react";
 
-export const TaskStats = ({ stats, isLoading }) => {
+export const TaskStats = () => {
+  const { stats, isLoading } = useTaskState();
   const completionRate =
     stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
